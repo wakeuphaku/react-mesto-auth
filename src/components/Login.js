@@ -35,7 +35,7 @@ export function Login(props) {
             })
             .catch((err) => {
                 console.log(err);
-                props.handleInfoTooltipClick(false);
+                props.openInfoTooltip(false);
             })
     };
     return (

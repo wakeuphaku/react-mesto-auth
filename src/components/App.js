@@ -19,7 +19,7 @@ import ProtectedRoute from "./ProtectedRoute.js";
 import InfoTooltip from './InfoTooltip.js'
 
 function App() {
-
+  const navigate = useNavigate
   const [cards, setCards] = React.useState([]);
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = React.useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(false);
@@ -29,28 +29,33 @@ function App() {
   const [isLogin, setIsLogin] = React.useState(false);
   const [isInfoTooltipOpen, setIsInfoTooltipOpen] = React.useState(false);
   const [userEmail, setUserEmail] = React.useState("");
-  const [isSuccess, setIsSuccess] = React.useState(false);
+  const [isSuccessInfoTooltipStatus, setIssSuccessInfoTooltipStatus] = React.useState(false);
 
   React.useEffect(() => {
     api
       .getCards()
       .then(item => {
-        setCards(item);
+        if (isLogin) {
+          setCards(item);
+        }
       })
       .catch(err => {
         console.log(err);
       })
-  }, []);
+  }, [isLogin]);
 
   React.useEffect(() => {
     api.getUserInfo()
       .then(item => {
-        setCurrentUser(item);
+        if (isLogin) {
+          setCurrentUser(item);
+        }
+
       })
       .catch(err => {
         console.log(err);
       })
-  }, [])
+  }, [isLogin])
 
 
   function handleCardLike(card) {
@@ -138,15 +143,16 @@ function App() {
   }
   const handleLogin = () => {
     setIsLogin(true);
-    handleСheckToken()
+    setUserEmail(userEmail);
   };
   const handleLogout = () => {
     setIsLogin(false);
+    setUserEmail("");
   };
 
-  const handleInfoTooltipClick = (isSuccess) => {
+  const openInfoTooltip = (isSuccess) => {
     setIsInfoTooltipOpen(true);
-    setIsSuccess(isSuccess);
+    setIssSuccessInfoTooltipStatus(isSuccess);
   };
 
 
@@ -155,14 +161,14 @@ function App() {
   }, []);
 
   const handleСheckToken = () => {
-    if (localStorage.getItem("jwt")) {
-      const jwt = localStorage.getItem("jwt");
+    const jwt = localStorage.getItem("jwt");
+    if (jwt) {
       checkToken(jwt)
         .then((item) => {
           if (item) {
             setUserEmail(item.data.email);
             setIsLogin(true);
-
+            navigate("/", { replace: true });
           }
         })
         .catch((err) => {
@@ -187,7 +193,7 @@ function App() {
           <Routes>
 
             <Route
-              path="profile"
+              path="/*"
               element={
                 isLogin ? (
                   <Navigate to="/" replace />
@@ -215,26 +221,15 @@ function App() {
             <Route
               path="/sign-up"
               element={
-                <Register handleInfoTooltipClick={handleInfoTooltipClick} />
+                <Register openInfoTooltip={openInfoTooltip} />
               }
             />
             <Route
               path="/sign-in"
-              element={<Login handleLogin={handleLogin} handleInfoTooltipClick={handleInfoTooltipClick} />}
+              element={<Login handleLogin={handleLogin} openInfoTooltip={openInfoTooltip} />}
             />
           </Routes>
         </BrowserRouter>
-
-        {/* <Main
-            cards={cards}
-            onEditProfile={handleEditProfileClick}
-            onEditAvatar={handleEditAvatarClick}
-            onAddPlace={handleAddPlaceClick}
-            onCardClick={handleCardClick}
-            onCardLike={handleCardLike}
-            onCardDelete={handleCardDelete}
-
-          /> */}
 
         <EditProfilePopup
           isOpen={isEditProfilePopupOpen}
@@ -243,7 +238,7 @@ function App() {
         />
 
         <InfoTooltip
-          success={isSuccess}
+          success={isSuccessInfoTooltipStatus}
           onClose={closeAllPopups}
           isOpen={isInfoTooltipOpen}
 

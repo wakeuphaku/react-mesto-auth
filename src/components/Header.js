@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 
 export function Header(props) {
     const location = useLocation();
@@ -24,12 +24,11 @@ export function Header(props) {
                 </div>
 
             ) : (
-                <a
-                    href={location.pathname === "/sign-in" ? "/sign-up" : "/sign-in"}
+                <Link to={location.pathname === "/sign-in" ? "/sign-up" : "/sign-in"}
                     className="header__info-button"
                 >
                     {location.pathname === "/sign-in" ? "Регистрация" : "Войти"}
-                </a>
+                </Link>
             )}
         </header>
     )
