@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Route, Routes, Navigate, useNavigate } from 'react-router-dom';
+import { Route, Routes, Navigate, useNavigate } from 'react-router-dom';
 
 import { Header } from "./Header.js";
 import Main from "./Main.js";
@@ -19,7 +19,7 @@ import ProtectedRoute from "./ProtectedRoute.js";
 import InfoTooltip from './InfoTooltip.js'
 
 function App() {
-  const navigate = useNavigate
+  const navigate = useNavigate()
   const [cards, setCards] = React.useState([]);
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = React.useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(false);
@@ -32,30 +32,31 @@ function App() {
   const [isSuccessInfoTooltipStatus, setIssSuccessInfoTooltipStatus] = React.useState(false);
 
   React.useEffect(() => {
-    api
-      .getCards()
-      .then(item => {
-        if (isLogin) {
+    if (isLogin) {
+      api
+        .getCards()
+        .then(item => {
           setCards(item);
-        }
-      })
-      .catch(err => {
-        console.log(err);
-      })
+
+        }).catch(err => {
+          console.log(err);
+        })
+    }
+  }, [isLogin]);
+  React.useEffect(() => {
+    if (isLogin) {
+      api
+        .getUserInfo()
+        .then(item => {
+
+          setCurrentUser(item);
+        }).catch(err => {
+          console.log(err);
+        })
+    }
   }, [isLogin]);
 
-  React.useEffect(() => {
-    api.getUserInfo()
-      .then(item => {
-        if (isLogin) {
-          setCurrentUser(item);
-        }
 
-      })
-      .catch(err => {
-        console.log(err);
-      })
-  }, [isLogin])
 
 
   function handleCardLike(card) {
@@ -141,9 +142,9 @@ function App() {
     setSelectedCard(null)
     setIsInfoTooltipOpen(false)
   }
-  const handleLogin = () => {
+  const handleLogin = (email) => {
     setIsLogin(true);
-    setUserEmail(userEmail);
+    setUserEmail(email);
   };
   const handleLogout = () => {
     setIsLogin(false);
@@ -184,52 +185,53 @@ function App() {
 
       <div className="page">
 
-        <BrowserRouter>
-          <Header
-            isLogin={isLogin}
-            handleLogout={handleLogout}
-            userEmail={userEmail}
-          />
-          <Routes>
 
-            <Route
-              path="/*"
-              element={
-                isLogin ? (
-                  <Navigate to="/" replace />
-                ) : (
-                  <Navigate to="/sign-up" replace />
-                )
-              }
-            />
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute
-                  element={Main}
-                  isLogin={isLogin}
-                  cards={cards}
-                  onEditProfile={handleEditProfileClick}
-                  onEditAvatar={handleEditAvatarClick}
-                  onAddPlace={handleAddPlaceClick}
-                  onCardClick={handleCardClick}
-                  onCardLike={handleCardLike}
-                  onCardDelete={handleCardDelete}
-                />
-              }
-            />
-            <Route
-              path="/sign-up"
-              element={
-                <Register openInfoTooltip={openInfoTooltip} />
-              }
-            />
-            <Route
-              path="/sign-in"
-              element={<Login handleLogin={handleLogin} openInfoTooltip={openInfoTooltip} />}
-            />
-          </Routes>
-        </BrowserRouter>
+
+        <Header
+          isLogin={isLogin}
+          handleLogout={handleLogout}
+          userEmail={userEmail}
+        />
+        <Routes>
+
+          <Route
+            path="/*"
+            element={
+              isLogin ? (
+                <Navigate to="/" replace />
+              ) : (
+                <Navigate to="/sign-up" replace />
+              )
+            }
+          />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute
+                element={Main}
+                isLogin={isLogin}
+                cards={cards}
+                onEditProfile={handleEditProfileClick}
+                onEditAvatar={handleEditAvatarClick}
+                onAddPlace={handleAddPlaceClick}
+                onCardClick={handleCardClick}
+                onCardLike={handleCardLike}
+                onCardDelete={handleCardDelete}
+              />
+            }
+          />
+          <Route
+            path="/sign-up"
+            element={
+              <Register openInfoTooltip={openInfoTooltip} />
+            }
+          />
+          <Route
+            path="/sign-in"
+            element={<Login handleLogin={handleLogin} openInfoTooltip={openInfoTooltip} />}
+          />
+        </Routes>
+
 
         <EditProfilePopup
           isOpen={isEditProfilePopupOpen}
