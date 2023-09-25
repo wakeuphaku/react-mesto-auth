@@ -27,7 +27,7 @@ export function Login(props) {
                 // console.log(item);
                 if (item.token) {
                     setFormValue({ email: "", password: "" });
-                    props.handleLogin();
+                    props.handleLogin(formValue.email);
 
                     navigate("/", { replace: true });
                 }
