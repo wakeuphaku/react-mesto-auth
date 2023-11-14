@@ -1,4 +1,4 @@
-const baseUrl = 'https://api.mesto.haku.nomoredomainsmonster.ru/'
+const baseUrl = 'https://api.mesto.haku.nomoredomainsmonster.ru'
 
 const getResponseData = (res) => {
     if (!res.ok) {
